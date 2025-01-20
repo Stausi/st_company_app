@@ -68,7 +68,7 @@ jobs:
         run: |
           mkdir -p ./temp/st_company_app
           # Copy the necessary files while preserving directory structure
-          cp --parents client/* server/* locales/* ./temp/st_company_app/
+          cp --parents client/* server/* ./temp/st_company_app/
           cp config.lua fxmanifest.lua ./temp/st_company_app/
 
           # If web/build exists, include it
