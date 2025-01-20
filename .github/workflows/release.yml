@@ -66,28 +66,19 @@ jobs:
 
       - name: Bundle Files
         run: |
-          mkdir -p ./temp/st_billing
+          mkdir -p ./temp/st_company_app
           # Copy the necessary files while preserving directory structure
-          cp --parents client/* server/* locales/* ./temp/st_billing/
-          cp config.lua fxmanifest.lua ./temp/st_billing/
-
-          # Copy README if it exists (case-insensitive)
-          if [ -f "./README.md" ]; then
-            cp ./README.md ./temp/st_billing/README.md
-          elif [ -f "./readme.md" ]; then
-            cp ./readme.md ./temp/st_billing/README.md
-          elif [ -f "./readme" ]; then
-            cp ./readme ./temp/st_billing/README.md
-          fi
+          cp --parents client/* server/* locales/* ./temp/st_company_app/
+          cp config.lua fxmanifest.lua ./temp/st_company_app/
 
           # If web/build exists, include it
           if [ -d "./web/build" ]; then
-            mkdir -p ./temp/st_billing/web
-            cp -r ./web/build ./temp/st_billing/web/build
+            mkdir -p ./temp/st_company_app/web
+            cp -r ./web/build ./temp/st_company_app/web/build
           fi
 
           # Create the zip file of the release package
-          cd ./temp && zip -r ../st_billing.zip ./st_billing
+          cd ./temp && zip -r ../st_company_app.zip ./st_company_app
 
       - name: Create Release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
@@ -96,7 +87,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           title: "Release v${{ env.RELEASE_VERSION }}"
           prerelease: false
-          files: st_billing.zip
+          files: st_company_app.zip
 
         env:
           CI: false
