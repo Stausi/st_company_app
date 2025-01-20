@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './CompanyInput.css'
 
+import { imageUrl } from '../App';
+
 const CompanyInput = (props) => {
     const { fetchNui } = window;
     
@@ -47,7 +49,7 @@ const CompanyInput = (props) => {
                     </div>
                 }
                 <div className="input-image">
-                    <img src={process.env.PUBLIC_URL + '/icons/' + props.company.img + '.png'} alt={props.company.name}/>
+                    <img src={imageUrl + '/icons/' + props.company.img + '.png'} alt={props.company.name}/>
                 </div>
                 <div className="input-header">
                     <h1>{ props.company.name }</h1>

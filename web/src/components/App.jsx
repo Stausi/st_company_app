@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Companies from './components/companies/Companies'
-import CompanyInput from './components/company-input/CompanyInput'
-import PlayerJob from './components/playerjob/PlayerJob'
+import Companies from './companies/Companies'
+import CompanyInput from './company-input/CompanyInput'
+import PlayerJob from './playerjob/PlayerJob'
 
-import Post from './components/post/Post'
-import CreatePost from './components/create-post/CreatePost'
+import Post from './post/Post'
+import CreatePost from './create-post/CreatePost'
 
 import "./App.css";
+
 const devMode = !window.invokeNative;
+export const imageUrl = devMode ? "" : "/web/build";
 
 const App = () => {
     const [isDarkMode, setDarkMode] = useState(true);
@@ -16,12 +18,13 @@ const App = () => {
 
     const [company, setCompany] = useState(-1);
     const [companies, setCompanies] = useState([]);
+    
     const [posts, setPosts] = useState([]);
     const [isCreatingPost, setIsCreatingPost] = useState(false);
     const [postImage, setPostImage] = useState("");
 
-    const [currentJob, setCurrentJob] = useState("");
-    const [currentGrade, setCurrentGrade] = useState("");
+    const [currentJob, setCurrentJob] = useState("Officiel lurker");
+    const [currentGrade, setCurrentGrade] = useState("Lurker");
     const [playerJobs, setPlayerJobs] = useState([]);
     const [playerAdmin, setPlayerAdmin] = useState(true);
 
@@ -50,7 +53,7 @@ const App = () => {
         }
 
         if (!selectGallery) {
-            setPostImage("https://cdn.discordapp.com/attachments/997878598180544573/1197185746604408912/file.png");
+            setPostImage(`${imageUrl}/background.png`);
             setIsCreatingPost(true);
         }
     };
@@ -128,105 +131,107 @@ const App = () => {
     return (
         <AppProvider>
             <div className={`app ${isDarkMode ? "dark" : "light"}`} ref={appDiv}>
-                
-                <div className={`app-content ${transitioning ? "transitioning" : ""}`}>
-                    { AppPage === "poster" &&
+                <main className={`app-content ${transitioning ? "transitioning" : ""}`}>
+                    {AppPage === "poster" && (
                         <>
                             <h1 className="headline">Firma Opslag</h1>
-
-                            { isCreatingPost === false &&
+                            {!isCreatingPost && (
                                 <>
-                                    { playerAdmin === true &&
+                                    {playerAdmin && (
                                         <div className="create-button">
-                                            <button onClick={() => enterCreatingPost()} className='create-post'><i className="fa-solid fa-plus"></i> Opret opslag</button>
+                                            <button onClick={enterCreatingPost} className="create-post">
+                                                <i className="fa-solid fa-plus"></i> Opret opslag
+                                            </button>
                                         </div>
-                                    }
-                                    <div className={`company-posts ${isDarkMode ? "dark" : "light"}`}>
+                                    )}
+                                    <div className="company-posts">
                                         {posts.map((company, index) => (
                                             <Post key={index} index={index} company={company} />
                                         ))}
                                     </div>
                                 </>
-                            }
-
-                            { isCreatingPost === true &&
+                            )}
+                            {isCreatingPost && (
                                 <>
                                     <div className="create-button">
-                                        <button onClick={() => setIsCreatingPost(false)} className='create-post'><i className="fa-solid fa-backward-step"></i> Gå tilbage</button>
+                                        <button onClick={() => setIsCreatingPost(false)} className="create-post">
+                                            <i className="fa-solid fa-backward-step"></i> Gå tilbage
+                                        </button>
                                     </div>
                                     <div className="company-create-post">
                                         <CreatePost darkMode={isDarkMode} image={postImage} setIsCreatingPost={setIsCreatingPost} />
                                     </div>
                                 </>
-                            }
+                            )}
                         </>
-                    }
-
-                    { AppPage === "companies" &&
+                    )}
+    
+                    {AppPage === "companies" && (
                         <>
-                            { companies[company] !== undefined 
-                                ?
-                                <>
-                                    <CompanyInput darkMode={isDarkMode} company={companies[company]} updateCompany={updateCompany} />
-                                </>
-                                :
+                            {companies[company] ? (
+                                <CompanyInput darkMode={isDarkMode} company={companies[company]} updateCompany={updateCompany} />
+                            ) : (
                                 <>
                                     <h1 className="headline">Firmaer</h1>
                                     <Companies darkMode={isDarkMode} companies={companies} updateCompany={updateCompany} />
                                 </>
-                            }
+                            )}
                         </>
-                    }
-
-                    { AppPage === "overview" &&
+                    )}
+    
+                    {AppPage === "overview" && (
                         <>
                             <h1 className="headline">Oversigt</h1>
                             <div className="user-overview">
                                 <div className="user-overview-container">
-                                    <h3>{ currentJob }</h3>
-                                    <h3>{ currentGrade }</h3>
+                                    <h3>{currentJob}</h3>
+                                    <h3>{currentGrade}</h3>
                                 </div>
                             </div>
-                            <div className={`player-jobs`}>
+                            <div className="player-jobs">
                                 {playerJobs.map((job, index) => (
                                     <PlayerJob key={index} darkMode={isDarkMode} index={index} job={job} />
                                 ))}
                             </div>
                         </>
-                    }
-                </div>
-
-                <div className="footer">
+                    )}
+                </main>
+    
+                <footer className="footer">
                     <button onClick={() => {
                         setTransitioning(true);
-
-                        setTimeout(() => {
-                            setAppPage("poster");
-                            setTransitioning(false);
-                        }, 300);
-                    }}>opslag</button>
-
-                    <button onClick={() => {
-                        setTransitioning(true);
-
-                        setTimeout(() => {
-                            setAppPage("companies");
-                            setTransitioning(false);
-                        }, 300);
-                    }}>oversigt</button>
-                    
-                    <button onClick={() => {
-                        setTransitioning(true);
-
                         setTimeout(() => {
                             setAppPage("overview");
                             setTransitioning(false);
                         }, 300);
-                    }}>dine jobs</button>
-                </div>
+                    }} className={`footer-button ${AppPage === "overview" ? "active" : ""}`} >
+                        <i class="fa-solid fa-house"></i>
+                        <p>Oversigt</p>
+                    </button>
+                    <button onClick={() => {
+                        setTransitioning(true);
+                        setTimeout(() => {
+                            setAppPage("companies");
+                            setTransitioning(false);
+                        }, 300);
+                    }} className={`footer-button ${AppPage === "companies" ? "active" : ""}`} >
+                        <i class="fa-solid fa-building"></i>
+                        <p>Firmaer</p>
+                    </button>
+                    <button onClick={() => {
+                        setTransitioning(true);
+                        setTimeout(() => {
+                            setAppPage("poster");
+                            setTransitioning(false);
+                        }, 300);
+                    }} className={`footer-button ${AppPage === "poster" ? "active" : ""}`} >
+                        <i class="fa-solid fa-envelope"></i>
+                        <p>Posters</p>
+                    </button>
+                </footer>
             </div>
         </AppProvider>
-    );
+    );    
 };
 
 const AppProvider = ({ children }) => {

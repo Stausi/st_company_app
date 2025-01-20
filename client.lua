@@ -39,7 +39,6 @@ AddEventHandler('esx:setJob', function(job)
 end)
 
 RegisterNUICallback("setupApp", function(data, cb)
-    print("setupApp")
     cb(lib.callback.await('st_company_app:GetCompanies', false))
 end)
 

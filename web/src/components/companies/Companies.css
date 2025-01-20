@@ -1,12 +1,13 @@
 .companies {
     width: 100%;
     display: flex;
-    flex-flow: column;
-    overflow: auto;
+    flex-direction: column;
+    overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    max-height: 45rem;
-    margin-bottom: 5rem;
+    flex-grow: 1;
+    min-height: 0;
+    margin-bottom: 1rem;
 }
 
 .companies::-webkit-scrollbar {

@@ -5,10 +5,6 @@
     border-radius: 5px;
 }
 
-.company:last-child {
-    margin-bottom: 2rem;
-}
-
 .company h1, .company h2 {
     margin: 0;
 }

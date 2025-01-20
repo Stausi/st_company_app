@@ -444,7 +444,7 @@ GetUserData = function(source)
         name = xPlayer.job.label, 
         grade = xPlayer.job.grade_label, 
         jobs = {},
-        admin = false,
+        admin = true,
     }
 
     -- local playerWhitelistedJobs = exports.drp_jobs:GetJobCenterData(source)

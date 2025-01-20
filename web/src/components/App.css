@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app.light {
+    --bg-color: #fefefe;
+    --text-color: #111;
+    --button-bg: #e7e7e7;
+    --button-hover-bg: #d4d4d4;
+}
+
+.app.dark {
+    --bg-color: #000;
+    --headline-color: #fefefe;
+    --text-color: #fefefe;
+    --text-color-active: #076bcf;;
+    --button-bg: #141414;
+    --button-hover-bg: #076bcf;;
+}
+
+.app-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    overflow: hidden;
+}
+
+.app-content.transitioning {
+    opacity: 0;
+}
+
+.headline {
+    text-align: center;
+    margin: 4rem 0 1rem;
+    font-size: 1.5rem;
+    color: var(--headline-color);
+}
+
+.footer {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid rgba(150, 150, 150, .2);;
+    background: var(--button-bg);
+    padding: 1rem 0;
+    padding-bottom: 3rem;
+}
+
+.footer-button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--text-color);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color .3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    gap: 10px;
+}
+
+.footer-button i {
+    font-size: 1.5rem;
+}
+
+.footer-button.active {
+    color: var(--text-color-active);
+}
+
+.footer-button:hover {
+    color: var(--button-hover-bg);
+}
+
+.user-overview {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+}
+
+.user-overview-container {
+    padding: 1rem;
+    background: var(--button-bg);
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.user-overview-container h3 {
+    color: var(--headline-color);
+    font-family: 'Roboto', sans-serif;
+}
+
+.app .create-button {
+    width: 100%;
+    padding-left: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.app button.create-post {
+    margin: 0;
+    font-size: .8rem;
+    font-weight: bold;
+    color: #fefefe;
+    text-transform: uppercase;
+    border: none;
+    background: none;
+}
+
+.app button.create-post:hover {
+    cursor: pointer;
+}
+
+.app.light button.create-post {
+    color: #111;
+}
+
+.dev-wrapper {
+    position: absolute;
+
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+
+    width: 29rem;
+    height: 58.5rem;
+}

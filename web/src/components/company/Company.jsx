@@ -1,4 +1,5 @@
 import './Company.css';
+import { imageUrl } from '../App';
 
 const Company = (props) => {
     const isDarkMode = props.darkMode;
@@ -10,7 +11,7 @@ const Company = (props) => {
     return (
         <div onClick={() => props.updateCompany(props.index)} className={`company ${isDarkMode ? "dark" : "light"}`}>
             <div id="company-section" className="company-image">
-                <img src={process.env.PUBLIC_URL + '/icons/' + props.job.img + '.png'} alt={props.job.name}/>
+                <img src={imageUrl + '/icons/' + props.job.img + '.png'} alt={props.job.name}/>
             </div>
             <div id="company-section" className="company-name">
                 <h1>{ props.job.name }</h1>
