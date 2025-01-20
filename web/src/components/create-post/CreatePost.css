@@ -1,0 +1,25 @@
+.company-create-post .company-input {
+    margin-top: 1rem;
+}
+
+.company-create-post .company-inputs {
+    padding: 1rem;
+}
+
+.company-create-post .input-text {
+    padding: 0 1rem;
+}
+
+.post-input-image {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.post-input-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}

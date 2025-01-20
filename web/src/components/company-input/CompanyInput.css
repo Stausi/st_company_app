@@ -1,0 +1,183 @@
+.company-input {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.company-inputs {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 5px;
+    position: relative;
+}
+
+.company-input h1 {
+    margin: 1rem 0;
+    text-transform: uppercase;
+}
+
+.company-input.light h1 {
+    color: #111;
+}
+
+.company-input.dark h1 {
+    color: #fefefe;
+}
+
+.company-input .input-image img {
+    width: 4rem;
+    border-radius: 5px;
+}
+
+.company-input .input-header {
+    margin-bottom: 2rem;
+}
+
+.company-input .input-text {
+    display: flex;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.company-input .input-text textarea {
+    background: none;
+    border: none;
+    border-radius: 0px;
+    padding-bottom: .5rem;
+    width: 100%;
+    resize: none;
+    font-size: 1rem;
+}
+
+.company-input .input-text textarea:focus {
+    outline: none;
+}
+
+.company-input.dark .input-text textarea {
+    border-bottom: 1px solid #e7e7e7;
+    color: #e7e7e7;
+}
+
+.company-input.light .input-text textarea {
+    border-bottom: 1px solid #111;
+    color: #111;
+}
+
+.company-input .input-text textarea::-webkit-scrollbar {
+    display: none;
+}
+
+.company-input .input-text input {
+    background: none;
+    border: none;
+    border-radius: 0px;
+    padding-bottom: .5rem;
+    width: 100%;
+    resize: none;
+    font-size: 1rem;
+    font-family: monospace;
+}
+
+.company-input .input-text input:focus {
+    outline: none;
+}
+
+.company-input.dark .input-text input {
+    border-bottom: 1px solid #e7e7e7;
+    color: #e7e7e7;
+}
+
+.company-input.light .input-text input {
+    border-bottom: 1px solid #111;
+    color: #111;
+}
+
+.company-input .input-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.company-input .input-buttons button {
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.company-input .input-buttons button:hover {
+    cursor: pointer;
+}
+
+.company-input .input-buttons button.green {
+    background-color: #4CAF50;
+}
+
+.company-input .input-buttons button.red {
+    background-color: #f44336;
+}
+
+.company-input .worker-button {
+    position: absolute;
+    bottom: 6rem;
+}
+
+.company-input .worker-button button {
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.company-input .worker-button button.green {
+    background-color: #4CAF50;
+}
+
+.company-input .worker-button button.red {
+    background-color: #f44336;
+}
+
+.company-input .worker-button button:hover {
+    cursor: pointer;
+}
+
+.company-input .input-bell {
+    position: absolute;
+    top: 5%;
+    right: 10%;
+    color: #fefefe;
+}
+
+.app.light .company-input .input-bell {
+    color: #333;
+}
+
+.company-input .input-bell.green {
+    color: #4CAF50;
+}
+
+.app.light .company-input .input-bell.green {
+    color: #4CAF50;
+}
+
+.company-input .input-bell:hover {
+    cursor: pointer;
+}
+
+.company-input .input-bell i {
+    font-size: 2rem;
+}

@@ -1,0 +1,113 @@
+.company {
+    display: flex;
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1rem;
+    border-radius: 5px;
+}
+
+.company:last-child {
+    margin-bottom: 2rem;
+}
+
+.company h1, .company h2 {
+    margin: 0;
+}
+
+.company .company-image {
+    width: 15%;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.company .company-image img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 5px;
+}
+
+.company .company-name {
+    width: 50%;
+    padding: 5px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+.company .company-name h1 {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.company-status {
+    width: 35%;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.company-status h2.company-status-text {
+    text-transform: uppercase;
+    font-size: 1em;
+    width: 5rem;
+}
+
+.company-status .company-status-circle {
+    min-width: 1rem;
+    min-height: 1rem;
+    border-radius: 50%;
+    margin-right: .5rem;
+}
+
+.company-status .company-status-circle.offline {
+    background-color: #c32222;
+}
+
+.company-status .company-status-circle.online {
+    background-color: #4CAF50;
+}
+
+#pulse {
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
+    -webkit-animation: pulsate 3s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    opacity: 0.5;
+}
+
+@keyframes pulsate {
+    0% { 
+        opacity: 0.5;
+    }
+    50% { 
+        opacity: 1.0;
+    }
+    100% { 
+        opacity: 0.5;
+    }
+}
+
+.company:hover {
+    cursor: pointer;
+}
+
+.company.light {
+    background-color: #e7e7e7;
+}
+
+.company.dark {
+    background-color: #1c1c1c;
+}
+
+.company.light {
+    color: #111;
+}
+
+.company.dark {
+    color: #fefefe;
+}

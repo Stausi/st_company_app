@@ -1,0 +1,96 @@
+.company-posts {
+    display: flex;
+    flex-flow: column;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    max-height: 47rem;
+}
+
+.company-posts::-webkit-scrollbar {
+    display: none;
+}
+
+.post-container {
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.app.dark .post-container {
+    background-color: #1c1c1c;
+}
+
+.post-container .post-title {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.post-container .post-title img {
+    width: 2em;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.post-container .post-title h3 {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.post-container .post-title h3 {
+    color: #fefefe;
+}
+
+.post-container .post-image {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.post-container .post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.post-container .post-message {
+    padding: 10px;
+}
+
+.post-container .post-message p {
+    font-size: .9rem;
+    color: #fefefe;
+}
+
+.post-container .post-delete {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+}
+
+.post-container .post-delete button {
+    border: none;
+    background: none;
+    color: #fefefe;
+    margin: 0 5px;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+.app.light .post-container .post-delete button {
+    color: #111;
+}
+
+.post-container .post-delete button:hover {
+    cursor: pointer;
+}
