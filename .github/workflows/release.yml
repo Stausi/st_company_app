@@ -1,70 +1,33 @@
-name: Release
+name: Create Release with Zip File
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
-
-permissions:
-  contents: write
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
-  create-release:
-    name: Build and Create Tagged Release
+  build:
+    name: Create Zip File
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install Archive Tools
-        run: sudo apt install zip
-
-      - name: Checkout Source Code
+      - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.repository.default_branch }}
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.0.0
-        with:
-          version: 9
-
-      - name: Setup Node
+      - name: Install Node
         uses: actions/setup-node@v2
         with:
-          node-version: 18.x
-          cache: "pnpm"
-          cache-dependency-path: "web/pnpm-lock.yaml"
-
-      - name: Install Dependencies
-        run: pnpm i --frozen-lockfile
+          node-version: '18.x'
+      
+      - name: Install dependencies
+        run: npm install
         working-directory: web
 
-      - name: Run Build
-        run: pnpm build
+      - name: Build web
+        run: npm run build
         working-directory: web
-        env:
-          CI: false
 
-      - name: Bump Manifest Version
-        run: node .github/actions/bump-manifest-version.js
-        env:
-          TGT_RELEASE_VERSION: v${{ github.ref_name }}
-
-      - name: Push Manifest Change
-        uses: EndBug/add-and-commit@v8
-        with:
-          add: fxmanifest.lua
-          push: true
-          author_name: Manifest Bumper
-          author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          message: "chore: bump manifest version to v${{ env.RELEASE_VERSION }}"
-
-      - name: Update Tag Ref
-        uses: EndBug/latest-tag@latest
-        with:
-          tag-name: v${{ env.RELEASE_VERSION }}
-
-      - name: Bundle Files
+      - name: Prepare final package folder
         run: |
           mkdir -p ./temp/st_company_app
           # Copy the necessary files while preserving directory structure
@@ -80,15 +43,12 @@ jobs:
           # Create the zip file of the release package
           cd ./temp && zip -r ../st_company_app.zip ./st_company_app
 
-      - name: Create Release
-        uses: "marvinpinto/action-automatic-releases@v1.2.1"
-        id: auto_release
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: "Release v${{ env.RELEASE_VERSION }}"
-          prerelease: false
-          files: st_company_app.zip
-
+      - name: Upload st_company_app.zip to Release
+        uses: actions/upload-release-asset@v1
         env:
-          CI: false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.UPLOAD_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./st_company_app.zip
+          asset_name: st_company_app.zip
+          asset_content_type: application/zip
