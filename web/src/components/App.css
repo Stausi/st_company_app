@@ -4,54 +4,47 @@
     box-sizing: border-box;
 }
 
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: "Roboto", sans-serif;
-}
-
 .app {
+    height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: var(--text-color-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.app.light {
-    --bg-color: #fefefe;
-    --text-color: #111;
-    --button-bg: #e7e7e7;
-    --button-hover-bg: #d4d4d4;
-}
-
-.app.dark {
-    --bg-color: #000;
-    --headline-color: #fefefe;
-    --text-color: #fefefe;
-    --text-color-active: #076bcf;;
-    --button-bg: #141414;
-    --button-hover-bg: #076bcf;;
-}
-
-.app-content {
+.app-wrapper {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex-grow: 1;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
     opacity: 1;
     transition: opacity 0.2s ease;
     overflow: hidden;
 }
 
-.app-content.transitioning {
+.main-content.transitioning {
     opacity: 0;
 }
 
 .headline {
     text-align: center;
-    margin: 4rem 0 1rem;
+    margin: 4.5rem 0 1rem;
     font-size: 1.5rem;
     color: var(--headline-color);
 }
@@ -59,17 +52,18 @@ body, html {
 .footer {
     display: flex;
     justify-content: space-around;
-    border-top: 1px solid rgba(150, 150, 150, .2);;
-    background: var(--button-bg);
+    border-top: 1px solid rgba(150, 150, 150, .2);
+    background: var(--bg-color2);
     padding: 1rem 0;
-    padding-bottom: 3rem;
+    padding-bottom: 2rem;
+    width: 100%;
 }
 
 .footer-button {
     background: none;
     border: none;
     font-size: 1rem;
-    color: var(--text-color);
+    color: var(--text-color-secondary);
     text-transform: uppercase;
     cursor: pointer;
     transition: color .3s ease;
@@ -84,12 +78,8 @@ body, html {
     font-size: 1.5rem;
 }
 
-.footer-button.active {
+.footer-button.active, .footer-button:hover {
     color: var(--text-color-active);
-}
-
-.footer-button:hover {
-    color: var(--button-hover-bg);
 }
 
 .user-overview {
@@ -102,7 +92,7 @@ body, html {
 
 .user-overview-container {
     padding: 1rem;
-    background: var(--button-bg);
+    background: var(--bg-color2);
     width: 100%;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -127,6 +117,7 @@ body, html {
     font-weight: bold;
     color: #fefefe;
     text-transform: uppercase;
+    color: var(--text-color-primary);
     border: none;
     background: none;
 }
@@ -135,20 +126,13 @@ body, html {
     cursor: pointer;
 }
 
-.app.light button.create-post {
-    color: #111;
-}
-
+/* Do not edit, this allows you to view changes easily in your browser */
 .dev-wrapper {
-    position: absolute;
+    display: flex;
 
-    bottom: 0;
-    top: 0;
-    left: 0;
-    right: 0;
+    align-items: center;
+    justify-content: center;
 
-    margin: auto;
-
-    width: 29rem;
-    height: 58.5rem;
+    width: 100vw;
+    height: 100vh;
 }

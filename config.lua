@@ -2,18 +2,62 @@ Config = {}
 
 Config.ChangeJobCooldown = 30
 Config.StatusCooldown = 30
-Config.SubCooldown = 30
 
 Config.Companies = {
-    { name = "Ambulance", job = "ambulance", img = "ems", showStatus = true },
-    { name = "Politiet", job = "police", img = "politiet", showStatus = false },
-    { name = "Retsbygningen", job = "retten", img = "retten", showStatus = true },
-    { name = "Auto Exotic", job = "mecano", img = "mekaniker", showStatus = true },
-    { name = "Bilforhandler", job = "bilforhandler", img = "bilforhandler", showStatus = true },
-    { name = "MC Forhandler", job = "mcforhandler", img = "mcforhandler", showStatus = true },
-    { name = "Ejendomsmægler", job = "realestate", img = "realestate", showStatus = true },
-    { name = "Taxi", job = "taxi", img = "taxi", showStatus = true },
-    { name = "Weazel News", job = "weazel", img = "weazel", showStatus = true },
+    { 
+        name = "Ambulance", 
+        job = "ambulance", 
+        image = "ems", 
+        showStatus = true 
+    },
+    { 
+        name = "Politiet", 
+        job = "police", 
+        image = "politiet", 
+        showStatus = false 
+    },
+    { 
+        name = "Retsbygningen", 
+        job = "retten", 
+        image = "retten", 
+        showStatus = true 
+    },
+    { 
+        name = "Auto Exotic", 
+        job = "mecano", 
+        image = "mekaniker", 
+        showStatus = true 
+    },
+    { 
+        name = "Bilforhandler", 
+        job = "bilforhandler", 
+        image = "bilforhandler", 
+        showStatus = true 
+    },
+    { 
+        name = "MC Forhandler", 
+        job = "mcforhandler", 
+        image = "mcforhandler", 
+        showStatus = true 
+    },
+    { 
+        name = "Ejendomsmægler", 
+        job = "realestate", 
+        image = "realestate", 
+        showStatus = true 
+    },
+    { 
+        name = "Taxi", 
+        job = "taxi", 
+        image = "taxi", 
+        showStatus = true 
+    },
+    { 
+        name = "Weazel News", 
+        job = "weazel", 
+        image = "weazel", 
+        showStatus = true 
+    },
 }
 
 print_r = function(t)

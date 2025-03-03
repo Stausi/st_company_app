@@ -4,12 +4,8 @@
     margin: 0 1.5rem 1rem;
     border-radius: 5px;
     padding: 1rem;
-    background-color: #1c1c1c;
+    background-color: var(--com-bg-color);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-}
-
-.app.light .playerJob {
-    background-color: #fefefe;
 }
 
 .playerJob h1, .playerJob h2 {
@@ -22,11 +18,7 @@
 
 .playerJob .playerJob-name h1 {
     font-size: 1rem;
-    color: #fefefe;
-}
-
-.app.light .playerJob .playerJob-name h1 {
-    color: #111;
+    color: var(--text-color-primary);
 }
 
 .playerJob-buttons {
@@ -37,13 +29,9 @@
 .playerJob button {
     border: none;
     background: none;
-    color: #fefefe;
+    color: var(--text-color-primary);
     margin: 0 5px;
     text-transform: uppercase;
-}
-
-.app.light .playerJob button {
-    color: #111;
 }
 
 .playerJob button:hover {

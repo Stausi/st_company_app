@@ -17,13 +17,11 @@
     width: 100%;
     display: flex;
     flex-flow: column;
+    background-color: var(--bg-color2);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     margin-bottom: 2rem;
     position: relative;
-}
-
-.app.dark .post-container {
-    background-color: #1c1c1c;
+    border-radius: 5px;
 }
 
 .post-container .post-title {
@@ -42,11 +40,8 @@
     font-size: 1rem;
     font-weight: bold;
     text-transform: uppercase;
+    color: var(--text-color-primary);
     margin: 0;
-}
-
-.post-container .post-title h3 {
-    color: #fefefe;
 }
 
 .post-container .post-image {
@@ -69,7 +64,7 @@
 
 .post-container .post-message p {
     font-size: .9rem;
-    color: #fefefe;
+    color: var(--text-color-primary);
 }
 
 .post-container .post-delete {
@@ -81,14 +76,10 @@
 .post-container .post-delete button {
     border: none;
     background: none;
-    color: #fefefe;
+    color: var(--text-color-primary);
     margin: 0 5px;
     text-transform: uppercase;
     font-size: 1rem;
-}
-
-.app.light .post-container .post-delete button {
-    color: #111;
 }
 
 .post-container .post-delete button:hover {

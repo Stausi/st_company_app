@@ -3,24 +3,37 @@ local companyCounters = {}
 local serverJobsPlayers = {}
 local phoneData = {}
 
-local toggleSubscripeCooldown = {}
 local toggleStatusCooldown = {}
 local playerCompanyPings = {}
 local companyPosts = {}
 
+local subscribingSafeCache = {}
 local companySubscriped = {}
 
 Citizen.CreateThread(function()
+    local phone_company_subscriptions_added = st.database.addTable('phone_company_subscriptions',
+    [[
+      id INT NOT NULL AUTO_INCREMENT,
+      phone_number BIGINT(15) NOT NULL,
+      companies LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '[]',
+      PRIMARY KEY (id),
+      UNIQUE KEY (phone_number)
+    ]])
+
+    if not phone_company_subscriptions_added then
+        st.print.info('The database is up-to-date.')
+    end
+
     local result = MySQL.query.await("SELECT * FROM phone_company_subscriptions")
     if result then
         for _, data in pairs(result) do
-            if not companySubscriped[data.phone_number] then
+            if companySubscriped[data.phone_number] then
                 companySubscriped[data.phone_number] = {}
-            end
 
-            local companies = json.decode(data.companies)
-            for _, company in pairs(companies) do
-                companySubscriped[data.phone_number][company] = true
+                local companies = json.decode(data.companies)
+                for _, company in pairs(companies) do
+                    companySubscriped[data.phone_number][company] = true
+                end
             end
         end
     end
@@ -58,7 +71,39 @@ Citizen.CreateThread(function()
     
         playerCompanyPings[xPlayer.source] = sortedSubsCompanies
     end
+
+    while true do
+        Citizen.Wait(5 * 60 * 1000)
+        saveSubscripbedUsers()
+    end
 end)
+
+saveSubscripbedUsers = function()
+    local updateSqls = {}
+    for phoneNumber, data in pairs(subscribingSafeCache) do
+        local companies = json.encode(data.companies)
+        if data.insertData then
+            updateSqls[#updateSqls + 1] = {
+                query = "INSERT INTO phone_company_subscriptions (phone_number, companies) VALUES (@phone_number, @companies)",
+                values = { 
+                    phone_number = phoneNumber, 
+                    companies = companies 
+                }
+            }
+        else
+            updateSqls[#updateSqls + 1] = {
+                query = "UPDATE phone_company_subscriptions SET companies = @companies WHERE phone_number = @phone_number",
+                values = { 
+                    phone_number = phoneNumber, 
+                    companies = companies 
+                }
+            }
+        end
+    end
+
+    MySQL.transaction(updateSqls)
+    subscribingSafeCache = {}
+end
 
 RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
     local _source = source
@@ -103,7 +148,7 @@ RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
         })
     end
 
-    print("sup")
+    -- Send your message to a UI for a list of calls.
 end)
 
 RegisterNetEvent("st_company_app:SendCompanyPost", function(image, title, message)
@@ -123,7 +168,7 @@ RegisterNetEvent("st_company_app:SendCompanyPost", function(image, title, messag
     for _, company in pairs(Config.Companies) do
         if company.job == jobName then 
             companyName = company.name 
-            companyIcon = company.img 
+            companyIcon = company.image 
         end
     end
 
@@ -220,51 +265,37 @@ end)
 
 RegisterNetEvent("st_company_app:ToggleCompanySubscribe", function(name)
     local _source = source
+
     local xPlayer = ESX.GetPlayerFromId(_source)
+    if not xPlayer then return end
 
-    if not toggleSubscripeCooldown[_source] then
-        toggleSubscripeCooldown[_source] = 0
-    end
-
-    if (os.time() - Config.SubCooldown) < toggleSubscripeCooldown[_source] then
-        local minutes = math.floor((Config.SubCooldown - (os.time() - toggleSubscripeCooldown[_source])) / 60)
-        local seconds = math.fmod((Config.SubCooldown - (os.time() - toggleSubscripeCooldown[_source])), 60)
-        
-        TriggerClientEvent('ox_lib:notify', _source, { 
-            type = 'error', 
-            duration = 5000, 
-            description = ('Cooldown på: ' .. minutes .. " min. & " .. seconds .. " sekunder."),
-        })
-        
-        return
-    end
-
+    local insertData = false
     local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
-    local subscribedCompanies = companySubscriped[phoneNumber] or {}
-    if tableContains(subscribedCompanies, name) then
-        for key, company in pairs(subscribedCompanies) do
-            if company == name then table.remove(subscribedCompanies, key) end
-        end
+    if not companySubscriped[phoneNumber] then
+        companySubscriped[phoneNumber] = {}
+        insertData = true
+    end
+
+    local subscribedCompanies = companySubscriped[phoneNumber]
+    if subscribedCompanies[name] then
+        subscribedCompanies[name] = nil
     else
-        table.insert(subscribedCompanies, name)
+        subscribedCompanies[name] = true
     end
 
-    toggleSubscripeCooldown[_source] = os.time()
-    -- xPlayer.setCharacterData("subscribedCompanies", subscribedCompanies)
-
-    local sortedSubsCompanies = {}
-    for _, company in pairs(subscribedCompanies) do
-        sortedSubsCompanies[company] = true
-    end
-
-    local companies = Config.Companies
+    local companies = table.clone(Config.Companies)
     for _, company in pairs(companies) do
         company.status = IsJobOnline(company.job)
         company.isWorker = xPlayer.job.name == company.job
-        company.hasSub = sortedSubsCompanies[company.job] == true
+        company.hasSub = subscribedCompanies[company.job] == true
     end
 
-    playerCompanyPings[xPlayer.source] = sortedSubsCompanies
+    subscribingSafeCache[phoneNumber] = {
+        insertData = insertData,
+        companies = subscribedCompanies
+    }
+
+    playerCompanyPings[xPlayer.source] = subscribedCompanies
 
     TriggerClientEvent("st_company_app:updateCompanies", _source, companies)
 end)
@@ -410,29 +441,24 @@ GetServerPlayersOnlineOnJob = function(name)
 end
 exports("GetServerPlayersOnlineOnJob", GetServerPlayersOnlineOnJob)
 
-lib.callback.register('st_company_app:GetCompanies', function(source)
+st.callback.register('st_company_app:GetCompanies', function(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     if not xPlayer then return {} end
 
     local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
     local subscribedCompanies = companySubscriped[phoneNumber] or {}
 
-    local sortedSubsCompanies = {}
-    for _, company in pairs(subscribedCompanies) do
-        sortedSubsCompanies[company] = true
-    end
-
-    local companies = Config.Companies
+    local companies = table.clone(Config.Companies)
     for _, company in pairs(companies) do
         company.status = IsJobOnline(company.job)
         company.isWorker = xPlayer.job.name == company.job
-        company.hasSub = sortedSubsCompanies[company.job] == true
+        company.hasSub = subscribedCompanies[company.job] == true
     end
 
     return companies
 end)
 
-lib.callback.register('st_company_app:GetPosts', function(source)
+st.callback.register('st_company_app:GetPosts', function(source)
     return companyPosts
 end)
 
@@ -444,35 +470,26 @@ GetUserData = function(source)
         name = xPlayer.job.label, 
         grade = xPlayer.job.grade_label, 
         jobs = {},
-        admin = true,
+        admin = false,
     }
 
-    -- local playerWhitelistedJobs = exports.drp_jobs:GetJobCenterData(source)
-    -- if not playerWhitelistedJobs then return userData end
-
-    -- for _, job in pairs(playerWhitelistedJobs) do
-    --     table.insert(userData.jobs, {
-    --         name = job.title,
-    --         jobName = job.name,
-    --         grade = job.grade,
-    --         hasJob = xPlayer.job.name == job.name
-    --     })
-
-    --     if xPlayer.job.name == job.name then
-    --         if IsJobValid(xPlayer.job.name) and xPlayer.job.grade_name == "boss" then
-    --             userData.admin = true
-    --         end
-    --     end
-    -- end
+    -- Get your jobs here.
+    -- Job Data format:
+    -- table.insert(userData.jobs, {
+    --     name = job.title,
+    --     jobName = job.name,
+    --     grade = job.grade,
+    --     hasJob = xPlayer.job.name == job.name
+    -- })
 
     return userData
 end
 
-lib.callback.register('st_company_app:GetUserData', function(source)
+st.callback.register('st_company_app:GetUserData', function(source)
     return GetUserData(source)
 end)
 
-lib.callback.register('st_company_app:HasUserJobCooldown', function(source)
+st.callback.register('st_company_app:HasUserJobCooldown', function(source)
     if not changeJobCooldown[source] then
         changeJobCooldown[source] = 0
     end

@@ -71,18 +71,6 @@
     display: none;
 }
 
-.company-input.light {
-    --input-header-color: #111;
-    --input-border-color: #ccc;
-    --input-text-color: #111;
-}
-
-.company-input.dark {
-    --input-header-color: #fefefe;
-    --input-border-color: #555;
-    --input-text-color: #e7e7e7;
-}
-
 .company-input .input-buttons {
     width: 100%;
     display: flex;
@@ -156,20 +144,12 @@
 
 .company-input .input-bell {
     position: absolute;
-    top: 5%;
+    top: 7.5%;
     right: 10%;
-    color: #fefefe;
-}
-
-.app.light .company-input .input-bell {
-    color: #333;
+    color: var(--text-color-primary);
 }
 
 .company-input .input-bell.green {
-    color: #4CAF50;
-}
-
-.app.light .company-input .input-bell.green {
     color: #4CAF50;
 }
 
@@ -178,5 +158,5 @@
 }
 
 .company-input .input-bell i {
-    font-size: 2rem;
+    font-size: 1.6rem;
 }

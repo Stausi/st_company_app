@@ -1,26 +1,29 @@
 import  './Post.css'
+import { imageUrl, PostIF } from '../App';
 
-const Post = (props) => {
-    const { fetchNui } = window;
-    const company = props.company;
+interface Props {
+    post: PostIF;
+    index: number;
+}
 
+const Post: React.FC<Props> = ({ post, index }) => {
     async function DeletePost() {
-        await fetchNui("deletePost", { job: props.index })
+        await fetchNui("deletePost", { job: index })
     };
 
     return (
         <div className="post-container">
             <div className="post-title">
-                <img src={process.env.PUBLIC_URL + '/icons/' + company.icon + '.png'} alt={company.name}/>
-                <h3>{ company.title }</h3>
+                <img src={imageUrl + '/icons/' + post.icon + '.png'} alt={post.name}/>
+                <h3>{ post.title }</h3>
             </div>
             <div className="post-image">
-                <img src={ company.image } alt={company.name} />
+                <img src={ post.image } alt={post.name} />
             </div>
             <div className="post-message">
-                <p>{ company.message }</p>
+                <p>{ post.message }</p>
             </div>
-            { company.isAdmin &&
+            { post.isAdmin &&
                 <div className="post-delete">
                     <button onClick={() => DeletePost()}><i className="fa-solid fa-xmark"></i></button>
                 </div>

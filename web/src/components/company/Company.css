@@ -92,18 +92,7 @@
     cursor: pointer;
 }
 
-.company.light {
-    background-color: #e7e7e7;
-}
-
-.company.dark {
-    background-color: #1c1c1c;
-}
-
-.company.light {
-    color: #111;
-}
-
-.company.dark {
-    color: #fefefe;
+.company {
+    color: var(--text-color-primary);
+    background-color: var(--bg-color2);
 }

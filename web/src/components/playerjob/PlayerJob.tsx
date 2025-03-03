@@ -1,30 +1,33 @@
 import './PlayerJob.css';
+import { CompanyIF } from '../App';
 
-const PlayerJob = (props) => {
-    const { fetchNui } = window;
+interface Props {
+    job: CompanyIF;
+}
 
+const PlayerJob: React.FC<Props> = ({ job }) => {
     async function TakePlayerJob() {
-        await fetchNui("takePlayerJob", { job: props.job })
+        await fetchNui("takePlayerJob", { job: job })
     };
 
     async function QuitPlayerJob() {
-        await fetchNui("quitPlayerJob", { job: props.job })
+        await fetchNui("quitPlayerJob", { job: job })
     };
 
     return (
         <div className={`playerJob`}>
             <div className="playerJob-name">
-                <h1>{ props.job.name }</h1>
+                <h1>{ job.name }</h1>
             </div>
 
             <div className="playerJob-buttons">
-                { !props.job.hasJob &&
+                { !job.hasJob &&
                     <button className="playerJob-action" onClick={() => TakePlayerJob()}>
                         Tag Job
                     </button>
                 }
 
-                { !props.job.disableResign &&
+                { !job.disableResign &&
                     <button className="playerJob-action" onClick={() => QuitPlayerJob()}>
                         Opsig Job
                     </button>

@@ -19,12 +19,17 @@ Citizen.CreateThread(function()
         Wait(500)
     end
 
+    local url = GetResourceMetadata(GetCurrentResourceName(), "ui_page", 0)
+
     local added, errorMessage = exports["lb-phone"]:AddCustomApp({
         identifier = appInfo.identifier,
         name = appInfo.name,
+        
         description = appInfo.description,
         defaultApp = true,
-        ui = GetCurrentResourceName() .. "/web/build/index.html",
+        fixBlur = true,
+
+        ui = url:find("http") and url or GetCurrentResourceName() .. "/" .. url,
         icon = "https://cfx-nui-" .. GetCurrentResourceName() .. "/web/build/icon.png",
     })
 
@@ -39,15 +44,15 @@ AddEventHandler('esx:setJob', function(job)
 end)
 
 RegisterNUICallback("setupApp", function(data, cb)
-    cb(lib.callback.await('st_company_app:GetCompanies', false))
+    cb(st.callback.await('st_company_app:GetCompanies', false))
 end)
 
 RegisterNUICallback("setupOverview", function(data, cb)
-    cb(lib.callback.await('st_company_app:GetUserData', false))
+    cb(st.callback.await('st_company_app:GetUserData', false))
 end)
 
 RegisterNUICallback("setupPosts", function(data, cb)
-    local posts = lib.callback.await('st_company_app:GetPosts', false)
+    local posts = st.callback.await('st_company_app:GetPosts', false)
     for _, post in pairs(posts) do
         local isAdmin = false
         if ESX.PlayerData.job.name == post.name then
@@ -66,10 +71,10 @@ RegisterNetEvent("esx:setJob", function(job)
 end)
 
 RegisterNUICallback("takePlayerJob", function(data, cb)
-    local HasUserJobCooldown = lib.callback.await('st_company_app:HasUserJobCooldown', false)
+    local HasUserJobCooldown = st.callback.await('st_company_app:HasUserJobCooldown', false)
     if HasUserJobCooldown then
         local timeToGo = Config.ChangeJobCooldown / 60
-        lib.notify({ title = 'Fejl', description = ("Der skal gå %s min. imellem jobskifte."):format(math.floor(timeToGo+0.5)), type = 'error' })
+        st.notify({ title = 'Fejl', description = ("Der skal gå %s min. imellem jobskifte."):format(math.floor(timeToGo+0.5)), type = 'error' })
         return cb('ok')
     end
 
@@ -80,22 +85,24 @@ RegisterNUICallback("takePlayerJob", function(data, cb)
         Wait(0)
     end
 
-    local newData = lib.callback.await('st_company_app:GetUserData', false)
+    local newData = st.callback.await('st_company_app:GetUserData', false)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshUser",
-        name = newData.name,
-        grade = newData.grade,
-        jobs = newData.jobs,
-        admin = newData.admin,
+        data = {
+            name = newData.name,
+            grade = newData.grade,
+            jobs = newData.jobs,
+            admin = newData.admin,
+        }
     })
 
-    local newJobData = lib.callback.await('st_company_app:GetCompanies', false)
+    local newJobData = st.callback.await('st_company_app:GetCompanies', false)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshCompanies",
-        companies = newJobData
+        data = newJobData
     })
 
-    local posts = lib.callback.await('st_company_app:GetPosts', false)
+    local posts = st.callback.await('st_company_app:GetPosts', false)
     for _, post in pairs(posts) do
         local isAdmin = false
         if ESX.PlayerData.job.name == post.name then
@@ -107,7 +114,7 @@ RegisterNUICallback("takePlayerJob", function(data, cb)
 
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshPosts",
-        posts = posts
+        data = posts
     })
 
     cb('ok')
@@ -121,13 +128,15 @@ RegisterNUICallback("quitPlayerJob", function(data, cb)
         Wait(0)
     end
 
-    local newData = lib.callback.await('st_company_app:GetUserData', false)
+    local newData = st.callback.await('st_company_app:GetUserData', false)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshUser",
-        name = newData.name,
-        grade = newData.grade,
-        jobs = newData.jobs,
-        admin = newData.admin,
+        data = {
+            name = newData.name,
+            grade = newData.grade,
+            jobs = newData.jobs,
+            admin = newData.admin,
+        }
     })
 
     cb('ok')
@@ -157,12 +166,6 @@ RegisterNUICallback("subscribeToggle", function(data, cb)
     cb('ok')
 end)
 
-RegisterNUICallback("subscribeToggle", function(data, cb)
-    TriggerServerEvent("st_company_app:ToggleCompanySubscribe", data.job)
-
-    cb('ok')
-end)
-
 RegisterNUICallback("focusText", function(data, cb)
     cb('ok')
 end)
@@ -176,7 +179,7 @@ end)
 RegisterNetEvent("st_company_app:updateCompanies", function(companies)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshCompanies",
-        companies = companies
+        data = companies
     })
 end)
 
@@ -192,6 +195,6 @@ RegisterNetEvent("st_company_app:updatePosts", function(posts)
 
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshPosts",
-        posts = posts
+        data = posts
     })
 end)
