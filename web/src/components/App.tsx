@@ -48,6 +48,7 @@ const App = () => {
     const [AppPage, setAppPage] = useState<string>("overview");
     const [transitioning, setTransitioning] = useState<Boolean>(false);
 
+    const [refreshKey, setRefreshKey] = useState(0);
     const [company, setCompany] = useState<number>(-1);
     const [companies, setCompanies] = useState<CompanyIF[]>([]);
     
@@ -55,8 +56,8 @@ const App = () => {
     const [isCreatingPost, setIsCreatingPost] = useState<Boolean>(false);
     const [postImage, setPostImage] = useState<string>("");
 
-    const [currentJob, setCurrentJob] = useState<string>("Officiel lurker");
-    const [currentGrade, setCurrentGrade] = useState<string>("Lurker");
+    const [currentJob, setCurrentJob] = useState<string>("");
+    const [currentGrade, setCurrentGrade] = useState<string>("");
     const [playerJobs, setPlayerJobs] = useState<CompanyIF[]>([]);
     const [playerAdmin, setPlayerAdmin] = useState<Boolean>(true);
 
@@ -120,10 +121,6 @@ const App = () => {
             setPlayerAdmin(overview.admin);
         }
 
-        const setCompaniesData = (data: CompanyIF[]) => {
-            setCompanies(data);
-        }
-
         const setUserOverview = (data: Overview) => {
             setCurrentJob(data.name);
             setCurrentGrade(data.grade);
@@ -133,12 +130,15 @@ const App = () => {
 
         useNuiEvent('refreshCompanies', setCompanies);
         useNuiEvent('refreshPosts', setPosts);
-        useNuiEvent('refreshOverview', setUserOverview);
+        useNuiEvent('refreshUser', setUserOverview);
 
         setupPosts();
         setupCompanies();
         setupUserOverview();
-    }, [])
+    }, [refreshKey]);
+
+    const refreshApp = () => setRefreshKey(prevKey => prevKey + 1);
+    useNuiEvent('appOpened', refreshApp);
 
     return (
         <AppProvider>
@@ -283,4 +283,4 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     } else return children
 }
 
-export default App
+export default App;

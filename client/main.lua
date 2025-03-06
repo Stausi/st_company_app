@@ -4,23 +4,14 @@ local appInfo = {
     description = "Kontakt Et Firma"
 }
 
+local hasSetup = false
+
 Citizen.CreateThread(function()
     while GetResourceState("lb-phone") ~= "started" do
         Wait(500)
     end
 
-    while ESX == nil do
-		Citizen.Wait(0)
-    end
-    
-    ESX.PlayerData = ESX.GetPlayerData()
-
-    while GetResourceState("lb-phone") ~= "started" do
-        Wait(500)
-    end
-
     local url = GetResourceMetadata(GetCurrentResourceName(), "ui_page", 0)
-
     local added, errorMessage = exports["lb-phone"]:AddCustomApp({
         identifier = appInfo.identifier,
         name = appInfo.name,
@@ -31,16 +22,14 @@ Citizen.CreateThread(function()
 
         ui = url:find("http") and url or GetCurrentResourceName() .. "/" .. url,
         icon = "https://cfx-nui-" .. GetCurrentResourceName() .. "/web/build/icon.png",
+        onUse = function()
+            exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, { action = "appOpened" })
+        end,
     })
 
     if not added then
         print("Could not add app:", errorMessage)
     end
-end)
-
-RegisterNetEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(job)
-    ESX.PlayerData.job = job
 end)
 
 RegisterNUICallback("setupApp", function(data, cb)
@@ -53,10 +42,15 @@ end)
 
 RegisterNUICallback("setupPosts", function(data, cb)
     local posts = st.callback.await('st_company_app:GetPosts', false)
+    local jobName = st.framework:GetJobName()
+    local gradeName = st.framework:GetGradeName()
+
     for _, post in pairs(posts) do
         local isAdmin = false
-        if ESX.PlayerData.job.name == post.name then
-            if ESX.PlayerData.job.grade_name == "boss" then isAdmin = true end
+        if jobName == post.name then
+            if gradeName == "boss" then 
+                isAdmin = true 
+            end
         end
 
         post.isAdmin = isAdmin
@@ -65,24 +59,12 @@ RegisterNUICallback("setupPosts", function(data, cb)
     cb(posts)
 end)
 
-local awaitJob = false
-RegisterNetEvent("esx:setJob", function(job)
-    awaitJob = false
-end)
-
 RegisterNUICallback("takePlayerJob", function(data, cb)
     local HasUserJobCooldown = st.callback.await('st_company_app:HasUserJobCooldown', false)
     if HasUserJobCooldown then
         local timeToGo = Config.ChangeJobCooldown / 60
         st.notify({ title = 'Fejl', description = ("Der skal gå %s min. imellem jobskifte."):format(math.floor(timeToGo+0.5)), type = 'error' })
         return cb('ok')
-    end
-
-    awaitJob = true
-    TriggerServerEvent("drp_jobs:selectHire", data.job.jobName, data.job.grade, true)
-    
-    while awaitJob do
-        Wait(0)
     end
 
     local newData = st.callback.await('st_company_app:GetUserData', false)
@@ -102,11 +84,16 @@ RegisterNUICallback("takePlayerJob", function(data, cb)
         data = newJobData
     })
 
+    local jobName = st.framework:GetJobName()
+    local gradeName = st.framework:GetGradeName()
+
     local posts = st.callback.await('st_company_app:GetPosts', false)
     for _, post in pairs(posts) do
         local isAdmin = false
-        if ESX.PlayerData.job.name == post.name then
-            if ESX.PlayerData.job.grade_name == "boss" then isAdmin = true end
+        if jobName == post.name then
+            if gradeNamee == "boss" then 
+                isAdmin = true 
+            end
         end
 
         post.isAdmin = isAdmin
@@ -121,13 +108,6 @@ RegisterNUICallback("takePlayerJob", function(data, cb)
 end)
 
 RegisterNUICallback("quitPlayerJob", function(data, cb)
-    awaitJob = true
-    TriggerServerEvent("drp_jobs:resignJob", data.job.jobName, true)
-    
-    while awaitJob do
-        Wait(0)
-    end
-
     local newData = st.callback.await('st_company_app:GetUserData', false)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshUser",
@@ -184,10 +164,15 @@ RegisterNetEvent("st_company_app:updateCompanies", function(companies)
 end)
 
 RegisterNetEvent("st_company_app:updatePosts", function(posts)
+    local jobName = st.framework:GetJobName()
+    local gradeName = st.framework:GetGradeName()
+
     for _, post in pairs(posts) do
         local isAdmin = false
-        if ESX.PlayerData.job.name == post.name then
-            if ESX.PlayerData.job.grade_name == "boss" then isAdmin = true end
+        if jobName == post.name then
+            if gradeName == "boss" then 
+                isAdmin = true 
+            end
         end
 
         post.isAdmin = isAdmin

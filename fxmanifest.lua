@@ -4,7 +4,7 @@ game "gta5"
 author "Stausi"
 title "Stausi Scripts - Company Call App"
 description "Company Call App"
-version '1.0.0'
+version '1.0.1'
 lua54 'yes'
 package_id "6"
 
@@ -18,7 +18,6 @@ client_scripts {
 }
 
 shared_scripts {
-    '@es_extended/imports.lua',
     '@st_libs/init.lua',
     "config.lua",
 }
@@ -27,17 +26,19 @@ st_libs {
     'table',
     'print',
     "database",
+    "hook",
+    "framework-bridge",
     "version-checker",
 }
 
 files {
     "web/build/**/*",
-	'locales/*.json',
 }
 
 ui_page 'web/build/index.html'
 
 dependencies {
+    'st_libs',
     'es_extended',
     "lb-phone",
 }

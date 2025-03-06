@@ -38,19 +38,19 @@ Citizen.CreateThread(function()
         end
     end
 
-    local xPlayers = ESX.GetPlayers()
-    for i=1, #xPlayers, 1 do
-        local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
-        local playerJob = xPlayer.job.name
+    local players = st.framework:getPlayers()
+    for i=1, #players, 1 do
+        local user = st.framework:getUser(players[i])
+        local playerJob = user:getJobName()
 
         if not serverJobsPlayers[playerJob] then
             serverJobsPlayers[playerJob] = {}
         end
 
-        local identifier = xPlayer.identifier
+        local identifier = user.identifier
         serverJobsPlayers[playerJob][identifier] = true
 
-        local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
+        local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(user.source)
         if IsJobValid(playerJob) then
             if not companyCounters[playerJob] then
                 companyCounters[playerJob] = false
@@ -60,7 +60,7 @@ Citizen.CreateThread(function()
                 phoneData[playerJob] = {}
             end
 
-            phoneData[playerJob][xPlayer.source] = phoneNumber
+            phoneData[playerJob][user.source] = phoneNumber
         end
 
         local sortedSubsCompanies = {}
@@ -69,7 +69,7 @@ Citizen.CreateThread(function()
             sortedSubsCompanies[company] = true
         end
     
-        playerCompanyPings[xPlayer.source] = sortedSubsCompanies
+        playerCompanyPings[user.source] = sortedSubsCompanies
     end
 
     while true do
@@ -107,8 +107,8 @@ end
 
 RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
     local _source = source
-    local xPlayer = ESX.GetPlayerFromId(_source)
 
+    local user = st.framework:getUser(_source)
     if not IsJobValid(name) then 
         return 
     end
@@ -124,16 +124,17 @@ RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
         return
     end
 
+    local phoneNumber = user:getPhoneNumber()
     local companyOnline = IsJobOnline(name)
     if not companyOnline and selectedCompany.showStatus then
-        return exports["lb-phone"]:SendNotification(xPlayer.phoneNumber, {
+        return exports["lb-phone"]:SendNotification(phoneNumber, {
             app = "company_app", 
             title = "Fejl", 
             content = "Der er ingen på arbejde.", 
         })
     end
 
-    exports["lb-phone"]:SendNotification(xPlayer.phoneNumber, {
+    exports["lb-phone"]:SendNotification(phoneNumber, {
         app = "company_app", 
         title = "Besked sendt!", 
         content = ("Beskeden til %s er sendt."):format(selectedCompany.name), 
@@ -153,14 +154,15 @@ end)
 
 RegisterNetEvent("st_company_app:SendCompanyPost", function(image, title, message)
     local _source = source
-    local xPlayer = ESX.GetPlayerFromId(_source)
 
-    local jobName = xPlayer.job.name
+    local user = st.framework:getUser(_source)
+    local jobName = user:getJobName()
     if not IsJobValid(jobName) then
         return
     end
 
-    if xPlayer.job.grade_name ~= "boss" then
+    local gradeName = user:getGradeName()
+    if gradeName ~= "boss" then
         return
     end
 
@@ -198,9 +200,9 @@ end)
 
 RegisterNetEvent("st_company_app:DeleteCompanyPost", function()
     local _source = source
-    local xPlayer = ESX.GetPlayerFromId(_source)
 
-    local jobName = xPlayer.job.name
+    local user = st.framework:getUser(_source)
+    local jobName = user:getJobName()
     for key, post in pairs(companyPosts) do
         if post.name == jobName then table.remove(companyPosts, key) end
     end
@@ -210,13 +212,13 @@ end)
 
 RegisterNetEvent("st_company_app:ToggleCompanyStatus", function(name)
     local _source = source
-    local xPlayer = ESX.GetPlayerFromId(_source)
 
+    local user = st.framework:getUser(_source)
     if not toggleStatusCooldown[_source] then
         toggleStatusCooldown[_source] = 0
     end
 
-    if (os.time() - Config.SubCooldown) < toggleStatusCooldown[_source] then
+    if (os.time() - Config.StatusCooldown) < toggleStatusCooldown[_source] then
         local minutes = math.floor((Config.StatusCooldown - (os.time() - toggleStatusCooldown[_source])) / 60)
         local seconds = math.fmod((Config.StatusCooldown - (os.time() - toggleStatusCooldown[_source])), 60)
         
@@ -232,7 +234,7 @@ RegisterNetEvent("st_company_app:ToggleCompanyStatus", function(name)
     if companyCounters[name] == nil then return end
     companyCounters[name] = not companyCounters[name]
 
-    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
+    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(user.source)
     local subscribedCompanies = companySubscriped[phoneNumber] or {}
 
     local sortedSubsCompanies = {}
@@ -244,7 +246,7 @@ RegisterNetEvent("st_company_app:ToggleCompanyStatus", function(name)
     local companies = Config.Companies
     for _, company in pairs(companies) do
         company.status = IsJobOnline(company.job)
-        company.isWorker = xPlayer.job.name == company.job
+        company.isWorker = user:getJobName() == company.job
         company.hasSub = sortedSubsCompanies[company.job] == true
         if company.job == name then companyLabel = company.name end
     end
@@ -266,11 +268,11 @@ end)
 RegisterNetEvent("st_company_app:ToggleCompanySubscribe", function(name)
     local _source = source
 
-    local xPlayer = ESX.GetPlayerFromId(_source)
-    if not xPlayer then return end
+    local user = st.framework:getUser(_source)
+    if not user then return end
 
     local insertData = false
-    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
+    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(user.source)
     if not companySubscriped[phoneNumber] then
         companySubscriped[phoneNumber] = {}
         insertData = true
@@ -286,7 +288,7 @@ RegisterNetEvent("st_company_app:ToggleCompanySubscribe", function(name)
     local companies = table.clone(Config.Companies)
     for _, company in pairs(companies) do
         company.status = IsJobOnline(company.job)
-        company.isWorker = xPlayer.job.name == company.job
+        company.isWorker = user:getJobName() == company.job
         company.hasSub = subscribedCompanies[company.job] == true
     end
 
@@ -295,35 +297,38 @@ RegisterNetEvent("st_company_app:ToggleCompanySubscribe", function(name)
         companies = subscribedCompanies
     }
 
-    playerCompanyPings[xPlayer.source] = subscribedCompanies
+    playerCompanyPings[user.source] = subscribedCompanies
 
     TriggerClientEvent("st_company_app:updateCompanies", _source, companies)
 end)
 
-RegisterServerEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(source, job, lastJob)
+st.hook.registerAction('setJob', function(source, newJob, lastJob)
     local _source = source
-    local xPlayer = ESX.GetPlayerFromId(_source)
 
-    if job.name == lastJob.name then return end
+    local user = st.framework:getUser(_source)
+    if not user then return end
 
-    if not serverJobsPlayers[job.name] then
-        serverJobsPlayers[job.name] = {}
+    if newJob.name == lastJob.name then 
+        return 
     end
 
-    local identifier = xPlayer.identifier
-    serverJobsPlayers[job.name][identifier] = true
+    if not serverJobsPlayers[newJob.name] then
+        serverJobsPlayers[newJob.name] = {}
+    end
 
-    if IsJobValid(job.name) then
-        if not companyCounters[job.name] then
-            companyCounters[job.name] = false
+    local identifier = user.identifier
+    serverJobsPlayers[newJob.name][identifier] = true
+
+    if IsJobValid(newJob.name) then
+        if not companyCounters[newJob.name] then
+            companyCounters[newJob.name] = false
         end
 
-        if not phoneData[job.name] then
-            phoneData[job.name] = {}
+        if not phoneData[newJob.name] then
+            phoneData[newJob.name] = {}
         end
 
-        phoneData[job.name][xPlayer.source] = xPlayer.phoneNumber
+        phoneData[newJob.name][user.source] = user.phoneNumber
     end
 
     if not serverJobsPlayers[lastJob.name] then
@@ -339,24 +344,23 @@ AddEventHandler('esx:setJob', function(source, job, lastJob)
             phoneData[lastJob.name] = {}
         end
 
-        phoneData[lastJob.name][xPlayer.source] = nil
+        phoneData[lastJob.name][user.source] = nil
 
         if tablelength(phoneData[lastJob.name]) == 0 then
             companyCounters[lastJob.name] = false
         end
     end
-end)
+end, 10)
 
-RegisterNetEvent("esx:playerLoaded", function(playerId)
-    local playerId = playerId
-    local xPlayer = ESX.GetPlayerFromId(playerId)
+st.hook.registerAction('playerLoaded', function(source)
+    local user = st.framework:getUser(playerId)
+    local jobName = user:getJobName()
 
-    local jobName = xPlayer.job.name
     if not serverJobsPlayers[jobName] then
         serverJobsPlayers[jobName] = {}
     end
 
-    local identifier = xPlayer.identifier
+    local identifier = user.identifier
     serverJobsPlayers[jobName][identifier] = true
 
     if IsJobValid(jobName) then
@@ -368,24 +372,25 @@ RegisterNetEvent("esx:playerLoaded", function(playerId)
             phoneData[jobName] = {}
         end
 
-        phoneData[jobName][xPlayer.source] = xPlayer.phoneNumber
+        phoneData[jobName][user.source] = user.phoneNumber
     end
 
-    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
+    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(user.source)
     local subscribedCompanies = companySubscriped[phoneNumber] or {}
     for _, company in pairs(subscribedCompanies) do
         sortedSubsCompanies[company] = true
     end
 
-    playerCompanyPings[xPlayer.source] = sortedSubsCompanies
-end)
+    playerCompanyPings[user.source] = sortedSubsCompanies
+end, 10)
 
-RegisterNetEvent("esx:playerDropped", function(playerId)
-    local playerId = playerId
-    local xPlayer = ESX.GetPlayerFromId(playerId)
-    local identifier = xPlayer.identifier
+st.hook.registerAction('playerDropped', function(source)
+    local user = st.framework:getUser(_source)
+    if not user then return end
 
-    local jobName = xPlayer.job.name
+    local identifier = user.identifier
+    local jobName = user:getJobName()
+
     if not serverJobsPlayers[jobName] then
         serverJobsPlayers[jobName] = {}
     end
@@ -403,15 +408,15 @@ RegisterNetEvent("esx:playerDropped", function(playerId)
             phoneData[jobName] = {}
         end
 
-        phoneData[jobName][xPlayer.source] = nil
+        phoneData[jobName][user.source] = nil
 
         if phoneData[jobName] and tablelength(phoneData[jobName]) == 0 then
             companyCounters[jobName] = false
         end
     end
 
-    playerCompanyPings[xPlayer.source] = nil
-end)
+    playerCompanyPings[user.source] = nil
+end, 10)
 
 IsJobValid = function(name)
     local activeJobs = {}
@@ -442,16 +447,16 @@ end
 exports("GetServerPlayersOnlineOnJob", GetServerPlayersOnlineOnJob)
 
 st.callback.register('st_company_app:GetCompanies', function(source)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    if not xPlayer then return {} end
+    local user = st.framework:getUser(source)
+    if not user then return {} end
 
-    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(xPlayer.source)
+    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(user.source)
     local subscribedCompanies = companySubscriped[phoneNumber] or {}
 
     local companies = table.clone(Config.Companies)
     for _, company in pairs(companies) do
         company.status = IsJobOnline(company.job)
-        company.isWorker = xPlayer.job.name == company.job
+        company.isWorker = user:getJobName() == company.job
         company.hasSub = subscribedCompanies[company.job] == true
     end
 
@@ -463,12 +468,13 @@ st.callback.register('st_company_app:GetPosts', function(source)
 end)
 
 GetUserData = function(source)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    if not xPlayer then return {} end
+    local user = st.framework:getUser(source)
+    if not user then return {} end
 
+    local targetJob = user:getJob()
     local userData = { 
-        name = xPlayer.job.label, 
-        grade = xPlayer.job.grade_label, 
+        name = targetJob.label, 
+        grade = targetJob.grade_label, 
         jobs = {},
         admin = false,
     }
@@ -479,7 +485,7 @@ GetUserData = function(source)
     --     name = job.title,
     --     jobName = job.name,
     --     grade = job.grade,
-    --     hasJob = xPlayer.job.name == job.name
+    --     hasJob = false/true,
     -- })
 
     return userData
