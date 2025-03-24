@@ -67,59 +67,28 @@ RegisterNUICallback("takePlayerJob", function(data, cb)
         return cb('ok')
     end
 
-    local newData = st.callback.await('st_company_app:GetUserData', false)
-    exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
-        action = "refreshUser",
-        data = {
-            name = newData.name,
-            grade = newData.grade,
-            jobs = newData.jobs,
-            admin = newData.admin,
-        }
-    })
-
-    local newJobData = st.callback.await('st_company_app:GetCompanies', false)
-    exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
-        action = "refreshCompanies",
-        data = newJobData
-    })
-
-    local jobName = st.framework:GetJobName()
-    local gradeName = st.framework:GetGradeName()
-
-    local posts = st.callback.await('st_company_app:GetPosts', false)
-    for _, post in pairs(posts) do
-        local isAdmin = false
-        if jobName == post.name then
-            if gradeNamee == "boss" then 
-                isAdmin = true 
-            end
-        end
-
-        post.isAdmin = isAdmin
-    end
-
-    exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
-        action = "refreshPosts",
-        data = posts
-    })
+    TriggerServerEvent("st_company_app:takePlayerJob", data.job)
 
     cb('ok')
 end)
 
 RegisterNUICallback("quitPlayerJob", function(data, cb)
-    local newData = st.callback.await('st_company_app:GetUserData', false)
+    TriggerServerEvent("st_company_app:quitPlayerJob", data.job)
+
+    cb('ok')
+end)
+
+RegisterNetEvent("st_company_app:refreshUser", function(data)
     exports["lb-phone"]:SendCustomAppMessage(appInfo.identifier, {
         action = "refreshUser",
         data = {
-            name = newData.name,
-            grade = newData.grade,
-            jobs = newData.jobs,
-            admin = newData.admin,
+            name = data.name,
+            grade = data.grade,
+            jobs = data.jobs,
+            admin = data.admin,
+            hasDutySystem = data.hasDutySystem,
         }
     })
-
-    cb('ok')
 end)
 
 RegisterNUICallback("sendMessage", function(data, cb)
@@ -148,6 +117,11 @@ end)
 
 RegisterNUICallback("focusText", function(data, cb)
     cb('ok')
+end)
+
+RegisterNUICallback("toggleDuty", function(duty, cb)
+    local onDuty = exports["st_bossmenu"]:toggleDuty(duty)
+    cb(onDuty)
 end)
 
 RegisterNUICallback("deletePost", function(data, cb)

@@ -124,7 +124,7 @@ RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
         return
     end
 
-    local phoneNumber = user:getPhoneNumber()
+    local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(source)
     local companyOnline = IsJobOnline(name)
     if not companyOnline and selectedCompany.showStatus then
         return exports["lb-phone"]:SendNotification(phoneNumber, {
@@ -146,6 +146,17 @@ RegisterNetEvent("st_company_app:SendCompanyMessage", function(message, name)
             app = "company_app", 
             title = selectedCompany.name,
             content = "Opkald modtaget."
+        })
+    end
+
+    if GetResourceState("st_bossmenu") == "started" then
+        local playerPed = GetPlayerPed(_source)
+        local playerCoords = GetEntityCoords(playerPed)
+
+        exports["st_bossmenu"]:addCompanyCall(selectedCompany.job, {
+            location = playerCoords,
+            phoneNumber = phoneNumber,
+            message = message,
         })
     end
 
@@ -350,6 +361,9 @@ st.hook.registerAction('setJob', function(source, newJob, lastJob)
             companyCounters[lastJob.name] = false
         end
     end
+
+    local userData = GetUserData(_source)
+    TriggerClientEvent("st_company_app:refreshUser", _source, userData)
 end, 10)
 
 st.hook.registerAction('playerLoaded', function(source)
@@ -475,6 +489,7 @@ GetUserData = function(source)
     local userData = { 
         name = targetJob.label, 
         grade = targetJob.grade_label, 
+        hasDutySystem = false,
         jobs = {},
         admin = false,
     }
@@ -488,11 +503,80 @@ GetUserData = function(source)
     --     hasJob = false/true,
     -- })
 
+    if GetResourceState("st_bossmenu") == "started" then
+        userData.jobs = exports["st_bossmenu"]:GetUserCompanies(user.source)
+
+        if exports["st_bossmenu"]:HasValidCompany(targetJob.name) then
+            userData.admin = exports["st_bossmenu"]:HasUserPermission(user.source, "mobile_admin")
+            userData.hasDutySystem = not exports["st_bossmenu"]:bossMenuDutyEnabled()
+        end
+    end
+
+    for _, defaultJob in pairs(Config.DefaultUserJobs) do
+        if targetJob.name ~= defaultJob.name then
+            table.insert(userData.jobs, {
+                name = defaultJob.label,
+                jobName = defaultJob.name,
+                grade = defaultJob.grade,
+                hasJob = true,
+            })
+        end
+    end
+
     return userData
 end
 
 st.callback.register('st_company_app:GetUserData', function(source)
     return GetUserData(source)
+end)
+
+RegisterNetEvent("st_company_app:takePlayerJob", function(data)
+    local _source = source
+    local userData = GetUserData(_source)
+
+    local newPlayerJobData = nil
+    for _, job in pairs(userData.jobs) do
+        if job.jobName == data.jobName then
+            newPlayerJobData = job
+        end
+    end
+
+    if not newPlayerJobData then
+        return
+    end
+
+    local user = st.framework:getUser(_source)
+    if not user then return end
+
+    user:setJob(newPlayerJobData.jobName, newPlayerJobData.grade)
+end)
+
+RegisterNetEvent("st_company_app:quitPlayerJob", function(data)
+    local _source = source
+    local userData = GetUserData(_source)
+
+    local quitJobData = nil
+    for _, job in pairs(userData.jobs) do
+        if job.jobName == data.jobName then
+            quitJobData = job
+        end
+    end
+
+    if not quitJobData then
+        return
+    end
+
+    local user = st.framework:getUser(_source)
+    if not user then return end
+
+    if GetResourceState("st_bossmenu") == "started" then
+        local identifier = user:getPlayerIdentifier()
+        if not identifier then return end
+
+        exports["st_bossmenu"]:fireEmployee(quitJobData.jobName, identifier)
+    end
+
+    user:setJob("unemployed", 0)
 end)
 
 st.callback.register('st_company_app:HasUserJobCooldown', function(source)

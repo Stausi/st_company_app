@@ -3,6 +3,14 @@ Config = {}
 Config.ChangeJobCooldown = 30
 Config.StatusCooldown = 30
 
+Config.DefaultUserJobs = {
+    {
+        label = "Arbejdsløs",
+        name = "unemployed",
+        grade = 0,
+    }
+}
+
 Config.Companies = {
     { 
         name = "Ambulance", 
@@ -30,7 +38,7 @@ Config.Companies = {
     },
     { 
         name = "Bilforhandler", 
-        job = "bilforhandler", 
+        job = "cardealer", 
         image = "bilforhandler", 
         showStatus = true 
     },

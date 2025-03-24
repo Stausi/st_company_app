@@ -42,6 +42,7 @@ interface Overview {
     grade: string;
     jobs: CompanyIF[];
     admin: boolean;
+    hasDutySystem?: boolean;
 }
 
 const App = () => {
@@ -60,6 +61,14 @@ const App = () => {
     const [currentGrade, setCurrentGrade] = useState<string>("");
     const [playerJobs, setPlayerJobs] = useState<CompanyIF[]>([]);
     const [playerAdmin, setPlayerAdmin] = useState<Boolean>(true);
+
+    const [hasDutySystem, setHasDutySystem] = useState<Boolean>(true);
+    const [onDuty, setOnDuty] = useState<Boolean>(false);
+
+    const toggleDuty = async () => {
+        let dutyStatus = await fetchNui<boolean>("toggleDuty", !onDuty);
+        setOnDuty(dutyStatus);
+    };
 
     const updateCompany = (newCompanyValue: number) => {
         setTransitioning(true);
@@ -119,6 +128,9 @@ const App = () => {
             setCurrentGrade(overview.grade);
             setPlayerJobs(overview.jobs);
             setPlayerAdmin(overview.admin);
+
+            const dutySystem = overview.hasDutySystem ?? false;
+            setHasDutySystem(dutySystem);
         }
 
         const setUserOverview = (data: Overview) => {
@@ -126,6 +138,9 @@ const App = () => {
             setCurrentGrade(data.grade);
             setPlayerJobs(data.jobs);
             setPlayerAdmin(data.admin);
+
+            const dutySystem = data.hasDutySystem ?? false;
+            setHasDutySystem(dutySystem);
         }
 
         useNuiEvent('refreshCompanies', setCompanies);
@@ -137,8 +152,10 @@ const App = () => {
         setupUserOverview();
     }, [refreshKey]);
 
-    const refreshApp = () => setRefreshKey(prevKey => prevKey + 1);
-    useNuiEvent('appOpened', refreshApp);
+    if (!devMode) {
+        const refreshApp = () => setRefreshKey(prevKey => prevKey + 1);
+        useNuiEvent('appOpened', refreshApp);
+    }
 
     return (
         <AppProvider>
@@ -195,17 +212,43 @@ const App = () => {
                         {AppPage === "overview" && (
                             <>
                                 <h1 className="headline">Oversigt</h1>
-                                <div className="user-overview">
-                                    <div className="user-overview-container">
-                                        <h3>{currentJob}</h3>
-                                        <h3>{currentGrade}</h3>
+                                { hasDutySystem ? (
+                                    <div className="overview-grid">
+                                        <div className="overview-card">
+                                            <div className="overview-job-info">
+                                                <span className="job-title">{currentJob}</span>
+                                                <span className="job-grade">{currentGrade}</span>
+                                            </div>
+
+                                            <button
+                                                className={`duty-status-button ${onDuty ? "on" : "off"}`}
+                                                onClick={toggleDuty}
+                                            >
+                                                {onDuty ? "På vagt" : "Ikke på vagt"}
+                                            </button>
+                                        </div>
+
+                                        <div className="player-jobs">
+                                            {playerJobs.map((job, index) => (
+                                                <PlayerJob key={index} job={job} />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="player-jobs">
-                                    {playerJobs.map((job, index) => (
-                                        <PlayerJob key={index} job={job} />
-                                    ))}
-                                </div>
+                                ) : (
+                                    <>
+                                        <div className="user-overview">
+                                            <div className="user-overview-container">
+                                                <h3>{currentJob}</h3>
+                                                <h3>{currentGrade}</h3>
+                                            </div>
+                                        </div>
+                                        <div className="player-jobs">
+                                            {playerJobs.map((job, index) => (
+                                                <PlayerJob key={index} job={job} />
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>

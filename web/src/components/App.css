@@ -104,6 +104,68 @@
     font-family: 'Roboto', sans-serif;
 }
 
+.overview-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.overview-card {
+    background: var(--bg-color2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.overview-job-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.job-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--headline-color);
+}
+
+.job-grade {
+    font-size: 1rem;
+    color: #666;
+}
+
+.duty-status-button {
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 110px;
+    text-align: center;
+}
+
+.duty-status-button.on {
+    background-color: #4caf50;
+    color: white;
+}
+
+.duty-status-button.off {
+    background-color: #f44336;
+    color: white;
+}
+
+.duty-status-button:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
 .app .create-button {
     width: 100%;
     padding-left: 1rem;

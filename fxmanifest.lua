@@ -4,7 +4,7 @@ game "gta5"
 author "Stausi"
 title "Stausi Scripts - Company Call App"
 description "Company Call App"
-version '1.0.1'
+version '1.0.2'
 lua54 'yes'
 package_id "6"
 
